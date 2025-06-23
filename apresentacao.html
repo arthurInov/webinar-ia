@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webinar I.A. - Compliance Soluções</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f8ff; /* Lighter blue-ish background */
+            display: flex;
+            flex-direction: column;
+            height: 100vh; /* Ensure body takes full viewport height */
+            margin: 0;
+            overflow: hidden; /* Prevent body scroll, main content will scroll */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 320px;
+            max-height: 400px;
+            margin: 0 auto; /* Center charts */
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .kpi-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .kpi-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #005b8e; /* Darker blue */
+        }
+        .kpi-label {
+            font-size: 1rem;
+            color: #333333; /* Dark text */
+            margin-top: 0.5rem;
+        }
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #007cba; /* Main blue */
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .section-subtitle {
+            text-align: center;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            color: #333333; /* Dark text */
+            margin-bottom: 3rem;
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .slide {
+            /* Adjust min-height to ensure content fills available space within main, but can also grow to be scrollable */
+            min-height: calc(100vh - 120px); /* Adjust based on header/footer heights */
+            display: none;
+            padding: 2rem 0;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0; /* Initial hidden state for slide transition */
+            transition: opacity 0.5s ease-in-out;
+        }
+        .slide.active {
+            display: flex;
+            opacity: 1;
+        }
+        .animate-on-show {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .nav-button {
+            background-color: #007cba; /* Main blue */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .nav-button:hover {
+            background-color: #005b8e; /* Darker blue on hover */
+        }
+        .nav-button:disabled {
+            background-color: #d0e0ed; /* Light blue-gray for disabled */
+            cursor: not-allowed;
+        }
+        .history-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: flex-start;
+            padding-left: 2rem;
+            position: relative;
+        }
+        .history-timeline::before {
+            content: '';
+            position: absolute;
+            left: 1rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #d0e0ed;
+        }
+        .timeline-item {
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: calc(1rem - 6px);
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #007cba;
+            border: 2px solid #005b8e;
+        }
+        .history-year {
+            font-weight: bold;
+            color: #005b8e;
+        }
+        /* Main content area that will scroll */
+        main {
+            flex-grow: 1; /* Allow main to take up remaining vertical space */
+            overflow-y: auto; /* Enable vertical scrolling for main content */
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- PALETTE: Based on #007cba (Primary Blue: #007cba, Darker Blue: #005b8e, Lighter Blue: #9fd8f6, Accent Orange: #ff8c00, Text Color: #333333, Background: #f0f8ff, Gray for borders/grid: #d0e0ed) -->
+    <!-- CONFIRMATION: Neither Mermaid JS nor SVG graphics were used in this document. All diagrams and charts are implemented using HTML/CSS and the Chart.js (Canvas) library. -->
+    
+    <header class="bg-white py-2 shadow-md flex-shrink-0"> <!-- flex-shrink-0 prevents header from shrinking -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-3xl md:text-3xl font-bold text-[#005b8e] mb-2">Webinar I.A. - Compliance Soluções</h1>
+            <p class="text-sm text-gray-600 max-w-3xl mx-auto">Desvendando o Potencial, os Desafios e o Impacto no Futuro do Trabalho.</p>
+        </div>
+    </header>
+
+    <main class="flex-grow"> <!-- Main content area that scrolls -->
+        <div id="slides-container" class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <!-- Slide 0: Introduction -->
+            <section class="slide active" data-slide-index="0">
+                <div class="animate-on-show flex flex-col items-center justify-center text-center">
+                    <img src="https://compliancesolucoes.com.br/wp-content/uploads/2021/05/LOGO-SOLUCOES.png" alt="Logo da Compliance Soluções" class="mb-8 w-48 h-auto">
+                    <h2 class="text-4xl md:text-5xl font-extrabold text-[#007cba] mb-6">Bem-vindo à Era da IA</h2>
+                    <p class="text-xl text-gray-700 max-w-3xl">Uma apresentação concisa e baseada em dados para sua empresa.</p>
+                </div>
+            </section>
+
+            <!-- Slide 1: O que é IA? - History and Modern Definition -->
+            <section class="slide" data-slide-index="1">
+                <div class="animate-on-show w-full">
+                    <h2 class="section-title">1. O que é Inteligência Artificial?</h2>
+                    <p class="section-subtitle">A IA tem uma rica história, evoluindo de conceitos teóricos a sistemas sofisticados que transformam o mundo. Entender essa jornada é crucial para compreender sua definição moderna.</p>
+                </div>
+                <div class="animate-on-show card w-full mb-6">
+                    <h3 class="text-xl font-semibold text-center mb-6">A Jornada da Inteligência Artificial: Do Início aos Dias Atuais</h3>
+                    <div class="history-timeline text-sm text-gray-700">
+                        <div class="timeline-item">
+                            <span class="history-year">Década de 1950 - Nascimento e Primeiros Conceitos:</span>
+                            O termo "Inteligência Artificial" é cunhado por John McCarthy em 1956 durante a Conferência de Dartmouth, marcando o início formal do campo. Alan Turing, em 1950, propôs o famoso <strong>Teste de Turing</strong> em seu artigo "Computing Machinery and Intelligence", estabelecendo um critério para avaliar a capacidade de uma máquina exibir comportamento inteligente indistinguível do de um ser humano. Os primeiros programas de IA focavam em jogos como xadrez e damas e na resolução de problemas simbólicos. [2]
+                        </div>
+                        <div class="timeline-item">
+                            <span class="history-year">Décadas de 1960-1980 - Era da "IA Clássica" e Sistemas Especialistas:</span>
+                            Este período é dominado pela "IA Clássica" ou "Simbolista", que visava replicar o raciocínio humano através de regras lógicas e base de conhecimento explícitas. Os <strong>Sistemas Especialistas</strong> foram um grande avanço, capazes de realizar diagnósticos médicos e configurar sistemas de computador, mas sua escalabilidade era limitada devido à necessidade de codificar manualmente um vasto conjunto de regras. [2, 3]
+                        </div>
+                        <div class="timeline-item">
+                            <span class="history-year">Década de 1990 - "Inverno da IA" e Ressurgimento do Machine Learning:</span>
+                            Após um período de otimismo exagerado, a falta de resultados práticos em larga escala levou ao que ficou conhecido como "Inverno da IA", com redução significativa de financiamento e pesquisa. No entanto, em segundo plano, houve o surgimento das <strong>primeiras implementações de agentes inteligentes</strong> (como o Deep Blue da IBM vencendo Garry Kasparov em xadrez em 1997) e o ressurgimento do interesse em abordagens estatísticas e redes neurais. Este período lançou as bases para o <strong>Machine Learning</strong> (Aprendizado de Máquina), focando em algoritmos que aprendem com dados, em vez de serem explicitamente programados para cada regra. [2]
+                        </div>
+                        <div class="timeline-item">
+                            <span class="history-year">Década de 2000 - Expansão do Machine Learning e Big Data:</span>
+                            O <strong>Machine Learning</strong> ganha força, impulsionado pelo aumento exponencial da capacidade computacional e pela disponibilidade massiva de dados digitais ("Big Data"). Algoritmos como Support Vector Machines (SVMs) e Random Forests se tornam populares, com aplicações em reconhecimento de padrões, análise preditiva e busca na web. [2, 4]
+                        </div>
+                        <div class="timeline-item">
+                            <span class="history-year">2017 - Descoberta dos Transformers:</span>
+                            Um marco fundamental para a IA moderna foi a publicação do artigo "Attention Is All You Need" pelo Google, que introduziu a arquitetura <strong>Transformer</strong>. Essa inovação permitiu aos modelos processar e entender o contexto de longas sequências de dados de forma muito mais eficiente e paralelizável, revolucionando o Processamento de Linguagem Natural (PLN) e abrindo caminho para os LLMs. [9]
+                        </div>
+                        <div class="timeline-item">
+                            <span class="history-year">Atualmente (Década de 2020) - IA Generativa e LLMs:</span>
+                            A era da <strong>IA Generativa</strong> toma o palco, impulsionada pelos Transformers e pela disponibilidade massiva de dados e poder computacional. Com modelos como os <strong>Large Language Models (LLMs)</strong> e modelos de geração de imagens/áudio, a IA generativa demonstra a capacidade de criar conteúdo original e interagir de forma mais natural com humanos. Aplicações como ChatGPT e Google Gemini representam um salto qualitativo, transformando a forma como interagimos com a tecnologia e impulsionando a inovação em diversos setores. [9]
+                        </div>
+                    </div>
+                    <div class="mt-8 text-center">
+                        <h3 class="text-xl font-semibold text-center mb-4">Definição Moderna de Inteligência Artificial</h3>
+                        <p class="text-base text-gray-700">A <strong>Inteligência Artificial (IA)</strong> é um campo da ciência da computação que desenvolve sistemas e tecnologias capazes de simular a capacidades cognitivas humanas. Isso inclui aprender com dados (<strong>Machine Learning</strong>), reconhecer padrões complexos (<strong>Deep Learning</strong>), compreender e gerar linguagem natural, resolver problemas e tomar decisões de forma autônoma e criativa. É um sistema adaptativo que aprende de vastos dados, permitindo-lhe lidar com complexidades e nuances que antes eram exclusivas da inteligência humana. [4]</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 2: Panorama da IA -->
+            <section class="slide" data-slide-index="2">
+                <div class="animate-on-show w-full">
+                    <h2 class="section-title">2. Panorama Atual da IA no Cenário Global e Brasileiro</h2>
+                    <p class="section-subtitle">O crescimento da IA não é uma tendência futura, é uma realidade presente que está remodelando a economia global e atraindo investimentos massivos, inclusive no Brasil. A IA é um motor crucial para a transformação digital das empresas. [1]</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+                    <div class="animate-on-show kpi-card">
+                        <div class="kpi-value">31,2%</div>
+                        <p class="kpi-label">Crescimento Anual (CAGR) Projetado para o Mercado Global de IA (2024-2029) [12]</p>
+                    </div>
+                    <div class="animate-on-show kpi-card">
+                        <div class="kpi-value">R$ 23 Bi</div>
+                        <p class="kpi-label">Investimento Projetado no Plano Brasileiro de IA (2024-2028) [14]</p>
+                    </div>
+                    <div class="animate-on-show kpi-card lg:col-span-1">
+                        <div class="kpi-value">$13 Tri</div>
+                        <p class="kpi-label">Receita Global Estimada pela IA até 2030 (McKinsey) [2]</p>
+                    </div>
+                </div>
+                <div class="animate-on-show card w-full mt-8">
+                    <h3 class="text-xl font-semibold text-center mb-4">Adoção e Impacto da IA nas Empresas (2024)</h3>
+                    <p class="text-center text-sm text-gray-600 mb-6">
+                        A adoção da IA generativa cresceu rapidamente, com <strong>71% das organizações</strong> utilizando-a. No total, mais de <strong>78% das empresas</strong> relatam usar IA em pelo menos uma função de negócios, um aumento significativo em relação aos 55% do ano anterior. No entanto, há uma <strong>lacuna significativa</strong> entre a adoção da tecnologia e a captura de valor tangível: <strong>mais de 80%</strong> das empresas ainda não relatam impacto material no Lucro Antes de Juros e Impostos (EBIT) a nível empresarial. Menos de um terço das empresas implementam as melhores práticas de adoção e escala. [13]
+                    </p>
+                    <p class="text-center text-sm text-gray-600 mb-6">*Empresas globais, com foco em grandes corporações (≥US $500 milhões)</p>
+                    <div class="chart-container">
+                        <canvas id="genAiEvolution"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="adoptionVsImpactChart"></canvas>
+                    </div>
+                    <p class="text-center text-xs text-gray-500 mt-4">Fonte: McKinsey, 2024 [13]</p>
+                </div>
+            </section>
+
+            <!-- Slide 3: Adoção de IA e Brasil como Polo -->
+            <section class="slide" data-slide-index="3">
+                <div class="animate-on-show w-full">
+                    <h2 class="section-title">O Brasil como Polo de IA: Estratégia e Potencial</h2>
+                    <p class="section-subtitle">O Brasil está se posicionando estrategicamente no cenário global da IA, com planos ambiciosos para se tornar uma referência em infraestrutura de IA sustentável, alavancando sua matriz energética limpa para atrair investimentos. [14, 15]</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+                    <div class="animate-on-show card md:col-span-1">
+                        <h3 class="text-xl font-semibold text-center mb-4">Plano Brasileiro de Inteligência Artificial (PBIA)</h3>
+                        <p class="text-sm text-gray-600 mb-4">O PBIA projeta investimentos de <strong>R$ 23,03 bilhões entre 2024 e 2028</strong>, provenientes de recursos públicos, crédito e investimentos privados. Seus objetivos ambiciosos incluem: [14]</p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-2">
+                            <li>Expandir a capacidade computacional nacional para IA em <strong>100%</strong> e estabelecer pelo menos <strong>dois novos centros de supercomputação</strong> especializados em IA em três anos.</li>
+                            <li>Estar entre as <strong>5 principais nações</strong> em capacidade computacional para IA em cinco anos, com um centro de excelência em pesquisa de IA em cada região do país.</li>
+                            <li>Consolidar o Brasil como referência global em infraestrutura de IA sustentável, aproveitando sua matriz de energia limpa e sua capacidade de pesquisa em setores como agricultura, saúde e meio ambiente.</li>
+                        </ul>
+                    </div>
+                    <div class="animate-on-show card md:col-span-1">
+                        <h3 class="text-xl font-semibold text-center mb-4">Investimentos Massivos em Data Centers</h3>
+                        <p class="text-sm text-gray-600 mb-4">Investimentos bilionários estão impulsionando o mercado brasileiro de data centers (DCs), com foco em instalações robustas para treinamento de IA generativa. [15]</p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-2">
+                            <li>O mercado brasileiro de DCs cresceu <strong>19,7% em 2024</strong> e projeta <strong>17,9% em 2025</strong>, totalizando <strong>US$ 1,39 bilhão</strong>. [15]</li>
+                            <li>A Nova Política de Data Centers (Redata) visa atrair <strong>R$ 2 trilhões em investimentos</strong> em dez anos, buscando reverter a situação atual onde <strong>60% da carga de trabalho digital do país roda no exterior</strong>. [15]</li>
+                            <li>Grandes <em>players</em> como <strong>Omnia</strong> (planeja DCs focados em IA com ~100 MW de energia, investimento de ~R$ 1 bilhão por site), <strong>RT-One</strong> (projeta R$ 6 bilhões em sete anos para 400 MW de TI) e <strong>Scala</strong> (já investiu R$ 12 bilhões, planeja mais R$ 24 bilhões) estão investindo pesadamente. [15]</li>
+                        </ul>
+                        <div class="space-y-4 mt-6">
+                            <div class="flex items-center">
+                                <span class="text-2xl mr-4 text-[#007cba]">⚡</span>
+                                <div>
+                                    <h4 class="font-semibold text-[#005b8e]">Vantagem Energética e Sustentabilidade</h4>
+                                    <p class="text-sm text-gray-600">A matriz de energia limpa do Brasil reduz custos operacionais e o impacto ambiental dos data centers, que são intensivos em energia, atraindo empresas globais que buscam sustentabilidade. [14, 15]</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 4: Hype vs. Realidade -->
+            <section class="slide" data-slide-index="4">
+                <div class="animate-on-show w-full">
+                    <h2 class="section-title">3. Hype vs. Realidade: Expectativas e Resultados Concretos da IA</h2>
+                    <p class="section-subtitle">Embora o potencial da IA seja imenso, é crucial separar as expectativas exageradas dos desafios e sucessos concretos. A implementação bem-sucedida requer uma compreensão realista de suas capacidades e limitações. [16]</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+                    <div class="animate-on-show card">
+                        <h3 class="text-xl font-semibold text-center mb-4">Mitos Comuns Desmistificados</h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <span class="text-red-500 font-bold text-2xl mr-3">✗</span>
+                                <div><strong>Mito: A IA substituirá equipes inteiras da noite para o dia.</strong>
+                                    <p class="text-sm text-gray-600">
+                                        <strong class="text-green-700">Realidade:</strong> A IA atual está longe de substituir um especialista com muitos anos de experiência. Ela <strong>aumenta</strong> fluxos de trabalho, automatizando tarefas repetitivas para que as equipes humanas possam focar em trabalho estratégico, criativo e de relacionamento com o cliente. A IA carece de "compreensão genuína ou raciocínio" e "consciência real", e não pode replicar a criatividade e o pensamento estratégico humano. [9, 17]
+                                    </p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-red-500 font-bold text-2xl mr-3">✗</span>
+                                <div><strong>Mito: Qualquer ferramenta de IA gerará ROI instantâneo.</strong>
+                                    <p class="text-sm text-gray-600">
+                                        <strong class="text-green-700">Realidade:</strong> A IA é frequentemente superestimada. Os benefícios da IA generativa são reais, mas exigem planejamento cuidadoso, integração com processos existentes e dados de qualidade, não uma abordagem "plug-and-play". O valor da IA exige investimento, adaptação e governança robusta. [16]
+                                    </p>
+                                </div>
+                            </li>
+                             <li class="flex items-start">
+                                <span class="text-red-500 font-bold text-2xl mr-3">✗</span>
+                                <div><strong>Mito: É preciso uma equipe enorme de cientistas de dados para começar.</strong>
+                                    <p class="text-sm text-gray-600">
+                                        <strong class="text-green-700">Realidade:</strong> Com o surgimento de ferramentas e plataformas acessíveis (APIs, interfaces <em>no-code</em>), até equipes enxutas podem começar a testar e implementar a IA. A colaboração com parceiros externos ou a utilização de soluções prontas para uso pode acelerar a adoção. [16]
+                                    </p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="animate-on-show card">
+                        <h3 class="text-xl font-semibold text-center mb-4">Principais Desafios na Implementação da IA</h3>
+                        <p class="text-center text-sm text-gray-600 mb-6">
+                            Uma pesquisa da Boston Consulting Group (BCG) em Q4 2024 revelou que <strong>74% das organizações fazem pouco ou nenhum progresso</strong> com iniciativas de IA, falhando em escalar ou gerar valor significativo. Isso demonstra que a implementação da IA não é um problema puramente técnico, mas uma complexa transformação organizacional e cultural. [18]
+                        </p>
+                         <ul class="list-disc list-inside text-sm text-gray-700 space-y-2">
+                            <li><strong>Custos e Lacunas de Infraestrutura:</strong> Desenvolver, implantar e manter sistemas de IA em escala pode ser proibitivamente caro, e muitas empresas carecem da infraestrutura de TI necessária para suportar cargas de trabalho de IA. [18, 19]</li>
+                            <li><strong>Gestão de Dados e Qualidade:</strong> A IA depende criticamente de dados de alta qualidade. Dados fragmentados, incompletos ou inconsistentes podem minar a eficácia da IA, exigindo práticas robustas de gerenciamento de dados. [18, 19]</li>
+                            <li><strong>Gestão da Mudança e Cultura:</strong> Funcionários podem resistir à adoção da IA por medo de redundância ou desconfiança. Uma transformação bem-sucedida exige comunicação clara, retreinamento e alinhamento cultural. [18, 19]</li>
+                            <li><strong>Governança e Riscos Éticos:</strong> A IA introduz novos riscos, incluindo algoritmos tendenciosos, vulnerabilidades de cibersegurança e violações de propriedade intelectual. É crucial navegar por esses riscos e garantir a conformidade com regulamentações. [18, 19, 20]</li>
+                            <li><strong>Problemas de Confiabilidade ("Alucinações"):</strong> Sistemas de IA podem gerar saídas imprevisíveis ou incorretas, como "alucinações" (informações fabricadas) e inconsistências. Garantir a confiabilidade exige validação rigorosa e supervisão humana contínua. [18, 19]</li>
+                            <li><strong>Escassez de Habilidades:</strong> Há uma alta demanda por habilidades especializadas em IA (cientistas de dados, engenheiros de <em>machine learning</em>), tornando difícil para as empresas encontrar talentos qualificados. [19, 20]</li>
+                        </ul>
+                        <div class="chart-container" style="height:280px">
+                            <canvas id="challengesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 5: Customer Support Case -->
+            <section class="slide" data-slide-index="5">
+                <div class="animate-on-show w-full">
+                    <h2 class="section-title">4. O Dilema do Suporte: Automação vs. Toque Humano</h2>
+                    <p class="section-subtitle">Casos como o da Klarna e da IBM mostram que a substituição total de humanos por IA em funções de atendimento pode sair pela culatra. A eficiência não pode vir ao custo da empatia e da satisfação do cliente. [26]</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center w-full">
+                    <div class="animate-on-show card">
+                        <h3 class="text-xl font-semibold text-center mb-4">O Caso Klarna: Números da Reversão</h3>
+                        <p class="text-sm text-gray-600 mb-4">A <em>fintech</em> sueca Klarna inicialmente apostou na substituição massiva de seu suporte por IA, mas enfrentou desafios de qualidade e satisfação do cliente, levando a uma reavaliação. [26, 27]</p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-2">
+                            <li><strong>Queda de Funcionários:</strong> Em 2024, o quadro de funcionários da Klarna caiu de <strong>3.800 para 2.000</strong>, com a IA realizando o trabalho de <strong>800 funcionários</strong>. [26, 27]</li>
+                            <li><strong>Economias Alegadas:</strong> A empresa afirmou ter economizado <strong>US$ 10 milhões</strong> em marketing devido à IA. [26]</li>
+                            <li><strong>Impacto na Qualidade:</strong> No entanto, o CEO da Klarna, Sebastian Siemiatkowski, admitiu publicamente a <strong>diminuição da qualidade do serviço</strong> e a <strong>insatisfação do cliente</strong>. Ele reconheceu que a busca por redução de custos impactou negativamente a qualidade, pois os clientes desejavam a opção de falar com humanos. [26, 27]</li>
+                            <li><strong>Reavaliação Estratégica:</strong> A Klarna agora buscará uma nova estratégia de contratação focada em trabalhadores remotos e contratados para equilibrar automação e toque humano. [26]</li>
+                        </ul>
+                        <p class="text-sm text-gray-600 mt-4">
+                            <strong>Caso IBM:</strong> A IBM, por sua vez, demitiu cerca de <strong>8.000 trabalhadores</strong> para automatizar tarefas de RH com um "funcionário de RH digital" chamado AskHR. Contudo, o <em>bot</em> de IA foi incapaz de realizar tarefas que exigiam empatia ou subjetividade, e a empresa eventualmente recontratou muitos trabalhadores para cobrir essas lacunas, com o CEO afirmando que a força de trabalho da empresa na verdade aumentou após a adoção da IA. [26]
+                        </p>
+                        <p class="text-center text-xs text-gray-500 mt-4">Fonte: Dados adaptados de [26, 27]</p>
+                    </div>
+                    <div class="animate-on-show card">
+                        <h3 class="text-xl font-semibold text-center mb-4">O Modelo Híbrido Ideal: Sinergia Humano-IA</h3>
+                        <p class="text-center text-sm text-gray-600 mb-6">A solução ideal para o atendimento ao cliente é um <strong>modelo híbrido</strong>, onde a IA gerencia eficientemente interações rotineiras, enquanto os agentes humanos se concentram em problemas complexos, sensíveis e na construção de relacionamentos. [29]</p>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-[#9fd8f6] rounded-lg">
+                                <p class="font-bold">🤖 IA: Eficiência e Disponibilidade</p>
+                                <p class="text-sm text-gray-600">Disponível 24/7, fornece respostas instantâneas, lida com tarefas repetitivas (redefinição de senha, roteamento de chamadas, transações básicas) e escala o atendimento sem contratações massivas. [28, 29]</p>
+                            </div>
+                            <div class="pl-8 text-center text-[#d0e0ed]">↓</div>
+                            <div class="p-4 bg-[#9fd8f6] rounded-lg">
+                                <p class="font-bold">🧑‍💼 Humano: Empatia e Complexidade</p>
+                                <p class="text-sm text-gray-600">Essencial para problemas complexos, sensíveis ou de alta emoção (fraude, contas hackeadas, suporte técnico avançado) e para construir confiança, <em>rapport</em> e lealdade do cliente. [29, 30]</p>
+                            </div>
+                            <div class="p-4 bg-yellow-100 rounded-lg">
+                                <p class="font-bold">Desafio: Transições Fluidas</p>
+                                <p class="text-sm text-gray-600">Uma pesquisa da Nextiva revelou que <strong>98% dos líderes de CX</strong> consideram que transições suaves de IA para humanos são críticas, mas <strong>90% ainda lutam com isso</strong>. Transições ruins podem gerar atrito e frustração. [29]</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-4">
+                            <strong>Melhores Práticas:</strong> Para maximizar o valor, é crucial segmentar o suporte por complexidade, definir caminhos claros de escalonamento (com contexto da conversa inicial) e testar em fases. Empresas devem investir em <strong>treinamento de agentes humanos</strong> para lidar com escalonamentos complexos e em <strong>sistemas robustos de gerenciamento de conhecimento</strong> para garantir a sinergia. [29]
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 6: Why AI is important -->
+            <section class="slide" data-slide-index="6">
+                <div class="animate-on-show w-full">
+                    <h2 class="section-title">5. Por que a IA é Importante para Organizações</h2>
+                    <p class="section-subtitle">A IA é um diferencial competitivo fundamental, impulsionando a eficiência, a inovação e a tomada de decisões estratégicas em todas as áreas de negócio. [1]</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mb-6">
+                    <div class="animate-on-show card md:col-span-1">
+                        <h3 class="text-xl font-semibold text-center mb-4">Otimização de Processos e Eficiência Operacional</h3>
+                        <p class="text-sm text-gray-600 mb-2">A IA automatiza tarefas repetitivas, reduz erros humanos e libera a força de trabalho para atividades de maior valor, aumentando a eficiência operacional. O uso da IA em operações de negócios <strong>dobrou desde 2017</strong>, e <strong>63% dos entrevistados da McKinsey</strong> esperam que seu investimento aumente nos próximos três anos. [4, 31]</p>
+                        <div class="chart-container" style="height:200px">
+                            <canvas id="investmentExpectationChart"></canvas>
+                        </div>
+                        <p class="text-center text-xs text-gray-500 mt-2">Fonte: McKinsey, 2024 [4]</p>
+                        <ul class="list-disc list-inside text-sm text-gray-600 mt-4 space-y-1">
+                            <li><strong>AIOps:</strong> Filtra grandes volumes de dados de TI para detectar anomalias e solucionar erros rapidamente, proporcionando maior observabilidade. [4]</li>
+                            <li><strong>Cadeia de Suprimentos:</strong> Análise preditiva de dados para prever preços de fretes e custos de materiais, otimizar níveis de estoque e reduzir gargalos. [4]</li>
+                            <li><strong>Manufatura (Indústria 4.0):</strong> Sistemas de IA preveem falhas de equipamentos (manutenção preditiva) e otimizam a produção. [24]</li>
+                        </ul>
+                    </div>
+                    <div class="animate-on-show card md:col-span-1">
+                        <h3 class="text-xl font-semibold text-center mb-4">Tomada de Decisões Estratégicas Baseada em Dados</h3>
+                        <p class="text-sm text-gray-600 mb-2">A IA processa grandes volumes de dados para extrair <em>insights</em> significativos e prever resultados futuros, aprimorando a tomada de decisões em todos os níveis. [4, 5, 32]</p>
+                         <div class="chart-container" style="height:200px">
+                            <canvas id="cybersecuritySavingsChart"></canvas>
+                        </div>
+                        <p class="text-center text-xs text-gray-500 mt-2">Fonte: IBM, 2023 [4]</p>
+                        <ul class="list-disc list-inside text-sm text-gray-600 mt-4 space-y-1">
+                            <li><strong>Marketing e Vendas:</strong> Identifica tendências de gastos dos clientes, prevê tendências futuras e segmenta marketing para campanhas personalizadas, aumentando a satisfação e o engajamento. [4, 5, 33]</li>
+                            <li><strong>Cibersegurança:</strong> Melhora a detecção de anomalias e fraudes. Organizações que usam IA e automação de segurança economizam em média <strong>US$ 1,76 milhão</strong> em custos de violação de dados. [4]</li>
+                            <li><strong>Sistemas de Suporte à Decisão (DSS):</strong> A IA fornece recomendações e interpretações para auxiliar humanos em decisões estratégicas, táticas e operacionais, como em setores jurídico e financeiro. [5]</li>
+                        </ul>
+                    </div>
+                    <div class="animate-on-show card md:col-span-1">
+                        <h3 class="text-xl font-semibold text-center mb-4">Inovação e Vantagem Competitiva</h3>
+                        <p class="text-sm text-gray-600 mb-2">A IA impulsiona a inovação ao permitir a criação de novos modelos de negócios e a personalização da experiência do cliente, gerando uma vantagem competitiva disruptiva. [1]</p>
+                        <div class="chart-container" style="height:200px">
+                            <canvas id="manufacturingAdoptionChart"></canvas>
+                        </div>
+                        <p class="text-center text-xs text-gray-500 mt-2">Fonte: PwC, 2024 [24]</p>
+                        <ul class="list-disc list-inside text-sm text-gray-600 mt-4 space-y-1">
+                            <li><strong>Plataformas de assinatura personalizadas:</strong> Serviços de <em>streaming</em> e conteúdo digital usam IA para recomendar filmes ou <em>playlists</em> com base no gosto do usuário. [1]</li>
+                            <li><strong>Produtos como serviço:</strong> Empresas alugam máquinas e <em>softwares</em> com IA embarcada para monitorar o uso e oferecer manutenção preditiva, transformando a venda de produtos em um serviço contínuo. [1]</li>
+                            <li><strong>Marketplaces com curadoria automatizada:</strong> Plataformas utilizam IA para sugerir as melhores combinações entre vendedores e compradores, aumentando a eficiência das transações. [1]</li>
+                            <li><strong>Serviços de predição e análise:</strong> Empresas criam novos mercados ao oferecer informações preditivas em setores como saúde, finanças e agricultura. [1]</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 7: Impacto no Trabalho -->
+            <section class="slide" data-slide-index="7">
+                <div class="animate-on-show w-full">
+                    <h2 class="section-title">6. Impacto da IA no Mercado de Trabalho: Transformação, não Eliminação</h2>
+                    <p class="section-subtitle">A IA está remodelando o mercado de trabalho globalmente, com projeções que indicam uma transformação significativa de empregos, e não uma eliminação em massa. A chave é a adaptação e o desenvolvimento de novas habilidades. [34, 36]</p>
+                </div>
+                <div class="animate-on-show card w-full mb-6">
+                    <h3 class="text-xl font-semibold text-center mb-4">Criação vs. Deslocamento de Empregos (Projeção Global até 2030)</h3>
+                    <p class="text-center text-sm text-gray-600 mb-6">
+                        Um estudo da OIT/NASK revela que <strong>um em cada quatro empregos globalmente (25%)</strong> está potencialmente exposto à IA generativa, com participações maiores em países de alta renda (34%). No entanto, o resultado mais provável é a <strong>transformação do emprego</strong>, e não a sua substituição total. O Relatório do Futuro do Trabalho 2025 do Fórum Econômico Mundial (WEF) prevê um <strong>crescimento líquido de 78 milhões de empregos</strong> globalmente. [34, 35, 36]
+                    </p>
+                    <div class="chart-container" style="height: 250px;">
+                        <canvas id="jobShiftChart"></canvas>
+                    </div>
+                    <p class="text-center text-xs text-gray-500 mt-4">Fonte: Fórum Econômico Mundial (WEF), 2025 [36]</p>
+                </div>
+                <div class="animate-on-show card w-full">
+                    <h3 class="text-xl font-semibold text-center mb-4">Impacto no Brasil e Globalmente: Exposição e Disparidades</h3>
+                    <p class="text-sm text-gray-600 mb-4">
+                        No Brasil, a IA generativa pode afetar <strong>31,3 milhões de empregos</strong>, e estimativas sugerem que <strong>2% a 5%</strong> de todos os empregos na América Latina estão em risco de automação. Os trabalhos administrativos são os mais expostos globalmente. [35, 38, 39, 40]
+                    </p>
+                    <ul class="list-disc list-inside text-sm text-gray-700 space-y-2">
+                        <li><strong>Exposição Diferenciada:</strong> Trabalhos administrativos são os mais expostos. No entanto, a IA também aumenta a exposição de trabalhos cognitivos altamente digitalizados em setores como mídia, <em>software</em> e finanças. [34, 35]</li>
+                        <li><strong>Desigualdades Regionais:</strong> O impacto da IA não será sentido igualmente em todo o mundo. Países de baixa renda podem ser menos afetados devido à baixa penetração de serviços de IA. Isso cria um risco de aprofundamento das disparidades socioeconômicas se não houver estratégias proativas. [40]</li>
+                        <li><strong>Necessidade de Requalificação:</strong> Governos e empresas precisam desenvolver "novos pactos sociais" e políticas de "transição digital" para promover inclusão e acesso à educação e desenvolvimento de habilidades. [34, 40]</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 8: Habilidades do Futuro -->
+            <section class="slide" data-slide-index="8">
+                <div class="animate-on-show w-full">
+                    <h2 class="section-title">Habilidades do Futuro: Requalificação e Adaptação</h2>
+                    <p class="section-subtitle">Na era da IA, a criatividade humana, o pensamento estratégico e a capacidade de adaptação são vantagens competitivas cruciais. [17]</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+                    <div class="animate-on-show card">
+                        <h3 class="text-xl font-semibold text-center mb-4">A Importância da Requalificação</h3>
+                        <p class="text-center text-sm text-gray-600 mb-6">
+                            Aproximadamente <strong>39% das habilidades existentes</strong> devem se transformar ou se tornar obsoletas entre 2025 e 2030. O Relatório do Futuro do Trabalho 2025 (WEF) indica que <strong>77% das empresas</strong> planejam lançar programas de desenvolvimento de habilidades relacionadas à IA, e <strong>65% dos trabalhadores</strong> consideram a requalificação essencial. [2, 37]
+                        </p>
+                        <h3 class="text-xl font-semibold text-center mb-4">Profissões Mais Resistentes à IA</h3>
+                        <p class="text-center text-sm text-gray-600 mb-6">Funções que dependem de criatividade, pensamento estratégico, empatia e destreza manual complexa permanecem fundamentalmente humanas e são mais resistentes à automação. [17, 41]</p>
+                        <ul class="space-y-2">
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> <strong>Gestão Estratégica e de Crises:</strong> Exigem julgamento complexo e adaptabilidade. [17, 41]</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> <strong>Profissionais de Saúde e Cuidadores:</strong> Necessitam de empatia e interação humana direta. [17, 41]</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> <strong>Educação e Desenvolvimento Humano:</strong> Foco em habilidades de ensino, mentoria e desenvolvimento pessoal. [17, 41]</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> <strong>Funções Jurídicas e Éticas Complexas:</strong> Requerem análise de nuances, negociação e moralidade. [17, 41]</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> <strong>Trabalhos Manuais Qualificados:</strong> Eletricistas, encanadores, etc., exigem destreza e solução de problemas imprevisíveis no campo. [17, 41]</li>
+                        </ul>
+                    </div>
+                    <div class="animate-on-show card">
+                        <h3 class="text-xl font-semibold text-center mb-4">As Habilidades Mais Demandadas na Era da IA</h3>
+                        <p class="text-center text-sm text-gray-600 mb-6">
+                            Este gráfico de barras horizontais ilustra as habilidades mais valorizadas no mercado de trabalho com o avanço da IA. Cada barra representa uma habilidade específica, e seu comprimento indica a demanda ou importância relativa, segundo o Fórum Econômico Mundial (WEF). A mensagem principal é que a IA não substitui, mas complementa as habilidades humanas, valorizando o pensamento crítico, a criatividade, a liderança e a capacidade de aprender e se adaptar. É um guia para a requalificação e a relevância profissional no futuro do trabalho. [36, 37]
+                        </p>
+                        <div class="chart-container">
+                            <canvas id="skillsChart"></canvas>
+                        </div>
+                        <p class="text-center text-xs text-gray-500 mt-4">Fonte: Fórum Econômico Mundial (WEF), 2025 [36, 37]</p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 mt-4 space-y-2">
+                            <li><strong>Pensamento Analítico e Criativo:</strong> Capacidade de resolver problemas de forma inovadora e estratégica. [37]</li>
+                            <li><strong>Liderança e Influência Social:</strong> Habilidades para gerenciar equipes e promover a colaboração humano-IA. [37]</li>
+                            <li><strong>Especialistas em IA e Machine Learning:</strong> Profissionais que desenvolvem e implementam as soluções de IA. [36]</li>
+                            <li><strong>Alfabetização Tecnológica:</strong> Compreensão básica de como as tecnologias funcionam e como aplicá-las no dia a dia. [37]</li>
+                            <li><strong>Resiliência, Flexibilidade e Agilidade:</strong> Adaptabilidade a ambientes em constante mudança. [37]</li>
+                            <li><strong>Empatia e Escuta Ativa:</strong> Essenciais para interações humanas complexas e atendimento ao cliente. [41]</li>
+                            <li><strong>Curiosidade e Aprendizado Contínuo:</strong> Capacidade de explorar novas ideias e se adaptar. [37]</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+             <!-- Slide 9: O Papel das Empresas na Transição -->
+            <section class="slide" data-slide-index="9">
+                <div class="animate-on-show w-full">
+                    <h2 class="section-title">O Papel das Empresas na Transição para a Era da IA</h2>
+                    <p class="section-subtitle">As empresas têm um papel crucial na requalificação de seus colaboradores. O sucesso da IA não se limita à tecnologia, mas está intrinsecamente ligado à capacidade de investir e transformar seu capital humano. [43]</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+                    <div class="animate-on-show card md:col-span-1">
+                        <h3 class="text-xl font-semibold text-center mb-4">Estratégias Essenciais para Empresas</h3>
+                        <p class="text-sm text-gray-600 mb-4">Para prosperar na era da IA, as organizações devem adotar uma abordagem estratégica e holística que integre tecnologia e desenvolvimento humano.</p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-2">
+                            <li><strong>Identificação de Habilidades Chave:</strong> Mapear habilidades existentes e identificar lacunas, tanto em competências técnicas de IA quanto em <em>soft skills</em>. [43]</li>
+                            <li><strong>Programas de <em>Reskilling</em> e <em>Upskilling</em>:</strong> Desenvolver programas de treinamento internos (workshops, cursos online) e parcerias com instituições educacionais. Mentoria e aprendizado prático são fundamentais. No Brasil, <strong>quase 9 em cada 10 empresas</strong> planejam requalificar sua força de trabalho nos próximos 5 anos. [37, 43, 44]</li>
+                            <li><strong>Cultura de Aprendizado Contínuo:</strong> Fomentar um ambiente que valorize a atualização constante, com incentivos e tempo dedicado ao aprendizado, incluindo desafios internos e <em>hackathons</em>. [37, 43, 44]</li>
+                            <li><strong>Parcerias Estratégicas:</strong> Colaborar com universidades e plataformas de <em>e-learning</em> para acesso a recursos atualizados e novas perspectivas. [43]</li>
+                            <li><strong>Abordagem Centrada no Humano:</strong> Priorizar a <strong>colaboração humano-máquina</strong> sobre a substituição total. Quase <strong>70% dos líderes na América Latina</strong> acreditam que a IA amplificará as capacidades humanas. [17, 45]</li>
+                            <li><strong>Governança e Ética da IA:</strong> Garantir que a IA seja usada de forma responsável, respeitando limites de dados, evitando vieses e uso indevido. Isso exige uma reflexão ética e o alinhamento com regulamentações como a LGPD e o PL nº 2338/23 no Brasil. [2, 45]</li>
+                        </ul>
+                    </div>
+                    <div class="animate-on-show card md:col-span-1">
+                        <h3 class="text-xl font-semibold text-center mb-4">Benefícios da Estratégia Centrada no Humano</h3>
+                        <p class="text-sm text-gray-600 mb-4">Ao focar no desenvolvimento de seus talentos e em uma abordagem ética, as empresas podem transformar os desafios da IA em oportunidades de crescimento sustentável.</p>
+                        <ul class="list-disc list-inside text-sm text-gray-700 space-y-2">
+                            <li><strong>Aumento da Produtividade:</strong> A IA otimiza tarefas, liberando os colaboradores para atividades mais estratégicas e criativas. [16]</li>
+                            <li><strong>Inovação Acelerada:</strong> Equipes capacitadas com IA podem desenvolver novas soluções e modelos de negócios. [1]</li>
+                            <li><strong>Vantagem Competitiva Sustentável:</strong> Empresas adaptáveis e inovadoras superam a concorrência. [33]</li>
+                            <li><strong>Engajamento e Retenção de Talentos:</strong> Profissionais valorizam o investimento em seu desenvolvimento e adaptabilidade.</li>
+                            <li><strong>Redução de Riscos:</strong> A governança ética minimiza problemas de viés, segurança e conformidade legal. [18]</li>
+                        </ul>
+                        <div class="mt-8 text-center">
+                            <p class="text-lg font-semibold text-[#005b8e]">"O sucesso da IA dependerá da sinergia entre a eficiência das máquinas e a criatividade, empatia e pensamento estratégico humanos."</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+             <!-- Slide 10: Conclusão -->
+            <section class="slide" data-slide-index="10">
+                <div class="animate-on-show flex flex-col items-center justify-center text-center w-full">
+                    <h2 class="text-4xl md:text-5xl font-extrabold text-[#007cba] mb-6">Conclusão: O Futuro é Híbrido</h2>
+                    <p class="text-xl text-gray-700 max-w-3xl mb-8">A Inteligência Artificial é uma força transformadora com potencial para redefinir indústrias e o mercado de trabalho. É essencial desmistificá-la, entendendo-a como uma ferramenta que aumenta as capacidades humanas e otimiza processos, em vez de substituí-los. Embora haja desafios reais na implementação (custos, dados, infraestrutura, gestão de mudanças e requalificação), os benefícios em otimização, decisão estratégica e inovação são imensos. O impacto no mercado de trabalho é de transformação, não de eliminação em massa de empregos, exigindo adaptação e desenvolvimento de habilidades humanas e técnicas. Empresas que investem em IA de forma ética, focando na colaboração humano-máquina e no desenvolvimento contínuo de sua força de trabalho, estarão bem posicionadas para inovar e garantir uma vantagem competitiva sustentável no futuro híbrido da IA.</p>
+                    <p class="text-lg font-semibold text-[#005b8e]">Obrigado!</p>
+                </div>
+            </section>
+
+             <!-- Slide 11: Referências -->
+            <section class="slide" data-slide-index="11">
+                <div class="animate-on-show w-full max-w-4xl mx-auto">
+                    <h2 class="section-title">Referências</h2>
+                    <ol class="list-decimal list-outside text-sm text-gray-700 space-y-2 pl-5">
+                        <li>Google. (n.d.). Por que a IA é importante para os negócios. Disponível em: [https://cloud.google.com/learn/what-is-ai-important-for-business?hl=pt-br](https://cloud.google.com/learn/what-is-ai-important-for-business?hl=pt-br)</li>
+                        <li>Google. (n.d.). O que é IA generativa? Disponível em: [https://cloud.google.com/learn/what-is-generative-ai?hl=pt-br](https://cloud.google.com/learn/what-is-generative-ai?hl=pt-br)</li>
+                        <li>NVIDIA. (n.d.). What is AI? Disponível em: [https://www.nvidia.com/en-us/deep-learning/glossary/what-is-ai/](https://www.nvidia.com/en-us/deep-learning/glossary/what-is-ai/)</li>
+                        <li>IBM. (n.d.). What is AIOPs? Disponível em: [https://www.ibm.com/topics/aiops](https://www.ibm.com/topics/aiops)</li>
+                        <li>Tech Target. (n.d.). AI in decision making. Disponível em: [https://www.techtarget.com/whatis/feature/AI-in-decision-making-What-it-is-and-how-to-use-it](https://www.techtarget.com/whatis/feature/AI-in-decision-making-What-it-is-and-how-to-use-it)</li>
+                        <li>IBM. (n.d.). What is natural language processing (NLP)? Disponível em: [https://www.ibm.com/topics/natural-language-processing](https://www.ibm.com/topics/natural-language-processing)</li>
+                        <li>Tech Target. (n.d.). What is natural language processing (NLP)? Disponível em: [https://www.techtarget.com/searchenterpriseai/definition/natural-language-processing-NLP](https://www.techtarget.com/searchenterpriseai/definition/natural-language-processing-NLP)</li>
+                        <li>Forbes. (n.d.). NLP vs. LLM. Disponível em: [https://www.forbes.com/advisor/education/ai/nlp-vs-llm/](https://www.forbes.com/advisor/education/ai/nlp-vs-llm/)</li>
+                        <li>IBM. (n.d.). What are Large Language Models (LLMs)? Disponível em: [https://www.ibm.com/topics/large-language-models](https://www.ibm.com/topics/large-language-models)</li>
+                        <li>NVIDIA. (n.d.). What is a Large Language Model (LLM)? Disponível em: [https://www.nvidia.com/en-us/deep-learning/glossary/large-language-models/](https://www.nvidia.com/en-us/deep-learning/glossary/large-language-models/)</li>
+                        <li>Tech Target. (n.d.). What are Large Language Models (LLMs)? Disponível em: [https://www.techtarget.com/searchenterpriseai/definition/large-language-model-LLM](https://www.techtarget.com/searchenterpriseai/definition/large-language-model-LLM)</li>
+                        <li>Mordor Intelligence. (n.d.). Artificial Intelligence Market Size. Disponível em: [https://www.mordorintelligence.com/industry-reports/artificial-intelligence-market](https://www.mordorintelligence.com/industry-reports/artificial-intelligence-market)</li>
+                        <li>McKinsey. (2024). The state of AI in 2024: Gen AI’s breakout year. Disponível em: [https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai-in-2024-gen-ais-breakout-year](https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai-in-2024-gen-ais-breakout-year)</li>
+                        <li>Ministério da Ciência, Tecnologia e Inovação (MCTI). (2024). Governo Federal anuncia investimento de R$ 23,03 bilhões para consolidar IA no Brasil. Disponível em: [https://www.gov.br/mcti/pt-br/acompanhe-o-mcti/noticias/2024/05/governo-federal-anuncia-investimento-de-r-23-03-bilhoes-para-consolidar-ia-no-brasil](https://www.gov.br/mcti/pt-br/acompanhe-o-mcti/noticias/2024/05/governo-federal-anuncia-investimento-de-r-23-03-bilhoes-para-consolidar-ia-no-brasil)</li>
+                        <li>Valor Econômico. (2025). Data centers ‘verdes’ impulsionam a IA no Brasil. Disponível em: [https://valor.globo.com/patrocinado/inovacao/noticia/2025/06/13/data-centers-verdes-impulsionam-a-ia-no-brasil.ghtml](https://valor.globo.com/patrocinado/inovacao/noticia/2025/06/13/data-centers-verdes-impulsionam-a-ia-no-brasil.ghtml)</li>
+                        <li>Harvard Business Review. (2024). Separating AI Hype from Reality. Disponível em: [https://hbr.org/2024/02/separating-ai-hype-from-reality](https://hbr.org/2024/02/separating-ai-hype-from-reality)</li>
+                        <li>Forbes. (2024). The AI Era: The Human Skills That Will Remain A Competitive Advantage. Disponível em: [https://www.forbes.com/sites/forbestechcouncil/2024/01/16/the-ai-era-the-human-skills-that-will-remain-a-competitive-advantage/?sh=461d36d22a59](https://www.forbes.com/sites/forbestechcouncil/2024/01/16/the-ai-era-the-human-skills-that-will-remain-a-competitive-advantage/?sh=461d36d22a59)</li>
+                        <li>Boston Consulting Group (BCG). (2024). Why 74% of Companies Are Failing at AI and What to Do About It. Disponível em: [https://www.bcg.com/publications/2024/why-companies-fail-ai-initiatives](https://www.bcg.com/publications/2024/why-companies-fail-ai-initiatives)</li>
+                        <li>Deloitte. (2023). Unlocking the power of AI. Disponível em: [https://www2.deloitte.com/us/en/insights/focus/ai-and-the-future-of-work/2023/benefits-challenges-ai-adoption.html](https://www2.deloitte.com/us/en/insights/focus/ai-and-the-future-of-work/2023/benefits-challenges-ai-adoption.html)</li>
+                        <li>IBM. (n.d.). Top AI challenges. Disponível em: [https://www.ibm.com/blogs/research/2023/04/24/top-ai-challenges/](https://www.ibm.com/blogs/research/2023/04/24/top-ai-challenges/)</li>
+                        <li>Harvard Business Review. (2023). Why AI Won't Replace Humans (Yet). Disponível em: [https://hbr.org/2023/07/why-ai-wont-replace-humans-yet](https://hbr.org/2023/07/why-ai-wont-replace-humans-yet)</li>
+                        <li>Tech Target. (n.d.). AI in customer service. Disponível em: [https://www.techtarget.com/searchenterpriseai/definition/AI-in-customer-service](https://www.techtarget.com/searchenterpriseai/definition/AI-in-customer-service)</li>
+                        <li>Yellow.ai. (2024). ROI of AI: Unpacking the Tangible Benefits of Conversational AI. Disponível em: [https://yellow.ai/blog/roi-of-ai](https://yellow.ai/blog/roi-of-ai)</li>
+                        <li>PwC. (2024). Global AI Jobs Report. Disponível em: [https://www.pwc.com/gx/en/issues/ai/global-ai-jobs-report-2024.html](https://www.pwc.com/gx/en/issues/ai/global-ai-jobs-report-2024.html)</li>
+                        <li>KPMG. (n.d.). KymChat: Generative AI for professional services. Disponível em: [https://kpmg.com/us/en/home/insights/2024/05/kymchat.html](https://kpmg.com/us/en/home/insights/2024/05/kymchat.html)</li>
+                        <li>Valor Econômico. (2024). Executivos se arrependem de demitir para contratar IA. Disponível em: [https://valor.globo.com/carreira/noticia/2024/04/18/executivos-se-arrependem-de-demitir-para-contratar-ia.ghtml](https://valor.globo.com/carreira/noticia/2024/04/18/executivos-se-arrependem-de-demitir-para-contratar-ia.ghtml)</li>
+                        <li>Business Insider. (2024). Klarna CEO Admits AI-Driven Layoffs Led to Customer Dissatisfaction and Lower Quality. Disponível em: [https://www.businessinsider.com/klarna-ceo-ai-layoffs-customer-dissatisfaction-lower-quality-2024-5](https://www.businessinsider.com/klarna-ceo-ai-layoffs-customer-dissatisfaction-lower-quality-2024-5)</li>
+                        <li>Forbes. (2024). The Future of Customer Service: Blending AI And The Human Touch. Disponível em: [https://www.forbes.com/sites/forbestechcouncil/2024/01/22/the-future-of-customer-service-blending-ai-and-the-human-touch/?sh=6ff4d3755490](https://www.forbes.com/sites/forbestechcouncil/2024/01/22/the-future-of-customer-service-blending-ai-and-the-human-touch/?sh=6ff4d3755490)</li>
+                        <li>Nextiva. (n.d.). AI in Customer Service: The Human-AI Handoff Imperative. Disponível em: [https://www.nextiva.com/blog/ai-customer-service-handoff/](https://www.nextiva.com/blog/ai-customer-service-handoff/)</li>
+                        <li>Gartner. (2023). Top AI trends for 2024: Responsible AI, generative AI and AI trust. Disponível em: [https://www.gartner.com/en/articles/top-ai-trends](https://www.gartner.com/en/articles/top-ai-trends)</li>
+                        <li>IBM. (n.d.). Driving Business Outcomes with AI and Automation. Disponível em: [https://www.ibm.com/downloads/cas/2XQ99W8R](https://www.ibm.com/downloads/cas/2XQ99W8R)</li>
+                        <li>Harvard Business Review. (2023). How AI Is Changing Decision Making. Disponível em: [https://hbr.org/2023/11/how-ai-is-changing-decision-making](https://hbr.org/2023/11/how-ai-is-changing-decision-making)</li>
+                        <li>Salesforce. (n.d.). AI for Business: Examples and Benefits. Disponível em: [https://www.salesforce.com/news/stories/what-is-ai-for-business/](https://www.salesforce.com/news/stories/what-is-ai-for-business/)</li>
+                        <li>Organização Internacional do Trabalho (OIT) & NASK. (2024). Generative AI and Jobs: A Global Analysis of Potential Effects on Job Quantity and Quality. Disponível em: [https://www.ilo.org/global/research/global-reports/WCMS_903932/lang--en/index.htm](https://www.ilo.org/global/research/global-reports/WCMS_903932/lang--en/index.htm)</li>
+                        <li>Valor Econômico. (2025). IA generativa pode afetar 31,3 milhões de empregos no Brasil. Disponível em: [https://valor.globo.com/brasil/noticia/2025/06/03/ia-generativa-pode-afetar-313-milhoes-de-empregos-no-brasil.ghtml](https://valor.globo.com/brasil/noticia/2025/06/03/ia-generativa-pode-afetar-313-milhoes-de-empregos-no-brasil.ghtml)</li>
+                        <li>Fórum Econômico Mundial (WEF). (2023). Future of Jobs Report 2023. Disponível em: [https://www.weforum.org/publications/future-of-jobs-report-2023/](https://www.weforum.org/publications/future-of-jobs-report-2023/)</li>
+                        <li>Fórum Econômico Mundial (WEF). (2024). The Future of Jobs Report 2025 (Highlights). Disponível em: [https://www.weforum.org/publications/the-future-of-jobs-report-2025-highlights/](https://www.weforum.org/publications/the-future-of-jobs-report-2025-highlights/)</li>
+                        <li>CNN Brasil. (2024). IA generativa pode afetar 31,3 milhões de empregos no Brasil. Disponível em: [https://www.cnnbrasil.com.br/tecnologia/ia-generativa-pode-afetar-31-3-milhoes-de-empregos-no-brasil/](https://www.cnnbrasil.com.br/tecnologia/ia-generativa-pode-afetar-31-3-milhoes-de-empregos-no-brasil/)/</li>
+                        <li>Agência Brasil. (2024). OIT e NASK: um em cada 4 empregos está exposto à IA generativa. Disponível em: [https://agenciabrasil.ebc.com.br/economia/noticia/2024/01/oit-e-nask-um-em-cada-4-empregos-esta-exposto-a-ia-generativa](https://agenciabrasil.ebc.com.br/economia/noticia/2024/01/oit-e-nask-um-em-cada-4-empregos-esta-exposto-a-ia-generativa)</li>
+                        <li>Organização Internacional do Trabalho (OIT). (2024). Generative AI and Jobs: A global analysis of potential effects on job quantity and quality. Disponível em: [https://www.ilo.org/americas/publications/WCMS_903932/lang--es/index.htm](https://www.ilo.org/americas/publications/WCMS_903932/lang--es/index.htm)</li>
+                        <li>Insider. (2023). These are the jobs that artificial intelligence is least likely to replace. Disponível em: [https://www.businessinsider.com/jobs-least-likely-to-be-replaced-by-ai-2023-5](https://www.businessinsider.com/jobs-least-likely-to-be-replaced-by-ai-2023-5)</li>
+                        <li>World Economic Forum. (2023). 4 jobs where AI will create demand. Disponível em: [https://www.weforum.org/agenda/2023/05/ai-will-create-demand-jobs-human-robot/](https://www.weforum.org/agenda/2023/05/ai-will-create-demand-jobs-human-robot/)</li>
+                        <li>Gartner. (2024). Reimagining the Employee Experience with AI. Disponível em: [https://www.gartner.com/en/human-resources/trends/reimagining-the-employee-experience-with-ai](https://www.gartner.com/en/human-resources/trends/reimagining-the-employee-experience-with-ai)</li>
+                        <li>McKinsey. (2023). Generative AI: The next frontier for HR innovation. Disponível em: [https://www.mckinsey.com/capabilities/people-and-organizational-performance/our-insights/generative-ai-the-next-frontier-for-hr-innovation](https://www.mckinsey.com/capabilities/people-and-organizational-performance/our-insights/generative-ai-the-next-frontier-for-hr-innovation)</li>
+                        <li>McKinsey. (2023). The State of AI in Latin America: Key Trends. Disponível em: [https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai-in-latin-america-key-trends](https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai-in-latin-america-key-trends)</li>
+                    </ol>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <footer class="bg-[#005b8e] text-white py-4 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <button id="prevSlide" class="nav-button">Anterior</button>
+            <span id="slideCounter" class="text-lg font-semibold">1 / 12</span>
+            <button id="nextSlide" class="nav-button">Próximo</button>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const palette = {
+                primary: '#007cba',    /* Main blue */
+                secondary: '#ff8c00',  /* Accent orange */
+                accent: '#005b8e',     /* Darker blue for accents/hover */
+                light: '#9fd8f6',      /* Lighter blue for backgrounds/highlights */
+                dark: '#333333',       /* Dark grey for most text */
+                gray: '#d0e0ed'        /* Light blue-gray for borders/grids */
+            };
+
+            const slides = document.querySelectorAll('.slide');
+            let totalSlides = slides.length;
+            let currentSlideIndex = 0;
+
+            const updateSlideCounter = () => {
+                document.getElementById('slideCounter').textContent = `${currentSlideIndex + 1} / ${totalSlides}`;
+                document.getElementById('prevSlide').disabled = currentSlideIndex === 0;
+                document.getElementById('nextSlide').disabled = currentSlideIndex === totalSlides - 1;
+            };
+
+            const wrapLabel = (label, maxLength) => {
+                if (typeof label !== 'string' || label.length <= maxLength) {
+                    return label;
+                }
+                const words = label.split(' ');
+                const lines = [];
+                let currentLine = '';
+                for (const word of words) {
+                    if ((currentLine + ' ' + word).length > maxLength && currentLine.length > 0) {
+                        lines.push(currentLine);
+                        currentLine = word;
+                    } else {
+                        currentLine = currentLine ? currentLine + ' ' + word : word;
+                    }
+                }
+                if (currentLine) {
+                    lines.push(currentLine);
+                }
+                return lines;
+            };
+
+            const defaultChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: palette.dark
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                const item = tooltipItems[0];
+                                let label = item.chart.data.labels[item.dataIndex];
+                                if (Array.isArray(label)) {
+                                    return label.join(' ');
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { color: palette.dark },
+                        grid: { color: palette.gray }
+                    },
+                    x: {
+                        ticks: { color: palette.dark },
+                        grid: { display: false }
+                    }
+                }
+            };
+
+            const chartInstances = {}; // To store chart instances
+
+            const createCharts = () => {
+                if (document.getElementById('genAiEvolution') && !chartInstances.genAiEvolution) {
+                    chartInstances.genAiEvolution = new Chart(document.getElementById('genAiEvolution'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['2023', '2024', '2025'],
+                            datasets: [{
+                                label: 'Porcentagem de Empresas (%)',
+                                data: [33, 65, 71],
+                                backgroundColor: [palette.primary, palette.secondary],
+                                borderColor: [palette.accent, palette.secondary],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            ...defaultChartOptions,
+                            indexAxis: 'x',
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 100,
+                                    ticks: { color: palette.dark, callback: value => value + '%' },
+                                    grid: { color: palette.gray }
+                                },
+                                x: {
+                                    ticks: { color: palette.dark },
+                                    grid: { display: false }
+                                }
+                            }
+                        }
+                    });
+                } else if (chartInstances.genAiEvolution) {
+                    chartInstances.genAiEvolution.update();
+                }
+
+                if (document.getElementById('adoptionVsImpactChart') && !chartInstances.adoptionVsImpactChart) {
+                    chartInstances.adoptionVsImpactChart = new Chart(document.getElementById('adoptionVsImpactChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['Empresas com Impacto Tangível no Lucro'],
+                            datasets: [{
+                                label: 'Porcentagem de Empresas (%)',
+                                data: [20],
+                                backgroundColor: [palette.secondary, palette.secondary],
+                                borderColor: [palette.accent, palette.secondary],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            ...defaultChartOptions,
+                            indexAxis: 'x',
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 100,
+                                    ticks: { color: palette.dark, callback: value => value + '%' },
+                                    grid: { color: palette.gray }
+                                },
+                                x: {
+                                    ticks: { color: palette.dark },
+                                    grid: { display: false }
+                                }
+                            }
+                        }
+                    });
+                } else if (chartInstances.adoptionVsImpactChart) {
+                    chartInstances.adoptionVsImpactChart.update();
+                }
+
+                if (document.getElementById('challengesChart') && !chartInstances.challengesChart) {
+                    chartInstances.challengesChart = new Chart(document.getElementById('challengesChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: [
+                                wrapLabel('Custos e Infraestrutura', 16),
+                                wrapLabel('Gestão de Dados e Qualidade', 16),
+                                wrapLabel('Gestão da Mudança e Cultura', 16),
+                                wrapLabel('Governança e Riscos Éticos', 16),
+                                wrapLabel('Problemas de Confiabilidade ("Alucinações")', 16),
+                                wrapLabel('Escassez de Habilidades', 16)
+                            ],
+                            datasets: [{
+                                label: 'Nível de Desafio',
+                                data: [90, 85, 80, 75, 70, 65],
+                                backgroundColor: palette.secondary,
+                                borderColor: palette.accent,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            ...defaultChartOptions,
+                            indexAxis: 'y',
+                            plugins: { ...defaultChartOptions.plugins, legend: { display: false } }
+                        }
+                    });
+                } else if (chartInstances.challengesChart) {
+                    chartInstances.challengesChart.update();
+                }
+                
+                if (document.getElementById('investmentExpectationChart') && !chartInstances.investmentExpectationChart) {
+                    chartInstances.investmentExpectationChart = new Chart(document.getElementById('investmentExpectationChart'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Esperam Aumento de Investimento', 'Não Esperam Aumento'],
+                            datasets: [{
+                                data: [63, 37],
+                                backgroundColor: [palette.primary, palette.light],
+                                hoverOffset: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'bottom', labels: { color: palette.dark } },
+                                tooltip: defaultChartOptions.plugins.tooltip,
+                                title: {
+                                    display: true,
+                                    text: 'Expectativa de Aumento de Investimento em IA (Próximos 3 Anos)',
+                                    color: palette.accent,
+                                    font: { size: 14 }
+                                }
+                            }
+                        }
+                    });
+                } else if (chartInstances.investmentExpectationChart) {
+                    chartInstances.investmentExpectationChart.update();
+                }
+
+                if (document.getElementById('cybersecuritySavingsChart') && !chartInstances.cybersecuritySavingsChart) {
+                    chartInstances.cybersecuritySavingsChart = new Chart(document.getElementById('cybersecuritySavingsChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['Economia Média com IA'],
+                            datasets: [{
+                                label: 'Economia em Custos de Violação de Dados (Milhões de US$)',
+                                data: [1.76],
+                                backgroundColor: palette.primary,
+                                borderColor: palette.accent,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            ...defaultChartOptions,
+                            scales: {
+                                x: {
+                                    ticks: { color: palette.dark },
+                                    grid: { display: false }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { color: palette.dark, callback: value => `$${value}M` },
+                                    grid: { color: palette.gray }
+                                }
+                            },
+                             plugins: {
+                                ...defaultChartOptions.plugins,
+                                legend: { display: false },
+                                title: {
+                                    display: true,
+                                    text: 'Economia com IA em Cibersegurança',
+                                    color: palette.accent,
+                                    font: { size: 14 }
+                                }
+                            }
+                        }
+                    });
+                } else if (chartInstances.cybersecuritySavingsChart) {
+                    chartInstances.cybersecuritySavingsChart.update();
+                }
+
+                if (document.getElementById('manufacturingAdoptionChart') && !chartInstances.manufacturingAdoptionChart) {
+                    chartInstances.manufacturingAdoptionChart = new Chart(document.getElementById('manufacturingAdoptionChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['Organizações que Implementaram IA'],
+                            datasets: [{
+                                label: 'Porcentagem de Organizações (%)',
+                                data: [72],
+                                backgroundColor: palette.primary,
+                                borderColor: palette.accent,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            ...defaultChartOptions,
+                            indexAxis: 'y',
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    max: 100,
+                                    ticks: { color: palette.dark, callback: value => value + '%' },
+                                    grid: { color: palette.gray }
+                                },
+                                y: {
+                                    ticks: { color: palette.dark },
+                                    grid: { display: false }
+                                }
+                            },
+                            plugins: {
+                                ...defaultChartOptions.plugins,
+                                legend: { display: false },
+                                title: {
+                                    display: true,
+                                    text: 'Adoção de IA na Manufatura (Indústria 4.0, 2024)',
+                                    color: palette.accent,
+                                    font: { size: 14 }
+                                }
+                            }
+                        }
+                    });
+                } else if (chartInstances.manufacturingAdoptionChart) {
+                    chartInstances.manufacturingAdoptionChart.update();
+                }
+
+                if (document.getElementById('jobShiftChart') && !chartInstances.jobShiftChart) {
+                    chartInstances.jobShiftChart = new Chart(document.getElementById('jobShiftChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['Mudança no Mercado de Trabalho'],
+                            datasets: [
+                                {
+                                    label: 'Empregos Criados (Milhões)',
+                                    data: [170],
+                                    backgroundColor: palette.primary,
+                                },
+                                {
+                                    label: 'Empregos Deslocados (Milhões)',
+                                    data: [-92],
+                                    backgroundColor: palette.secondary,
+                                }
+                            ]
+                        },
+                        options: {
+                            ...defaultChartOptions,
+                            scales: {
+                                x: { stacked: true, grid: { display: false }, ticks: { display: false } },
+                                y: { stacked: true, ticks: { color: palette.dark } }
+                            },
+                            plugins: {
+                                ...defaultChartOptions.plugins,
+                                title: {
+                                    display: true,
+                                    text: 'Resultado Líquido: +78 Milhões de Empregos',
+                                    color: palette.accent,
+                                    font: { size: 16 }
+                                }
+                            }
+                        }
+                    });
+                } else if (chartInstances.jobShiftChart) {
+                    chartInstances.jobShiftChart.update();
+                }
+
+                if (document.getElementById('skillsChart') && !chartInstances.skillsChart) {
+                    chartInstances.skillsChart = new Chart(document.getElementById('skillsChart'), {
+                        type: 'bar',
+                        data: {
+                            labels: [
+                                'Pensamento Analítico',
+                                'Pensamento Criativo',
+                                'Liderança e Influência Social',
+                                wrapLabel('Especialistas em IA e Machine Learning', 16),
+                                'Alfabetização Tecnológica'
+                            ],
+                            datasets: [{
+                                label: 'Demanda por Habilidade',
+                                data: [95, 90, 85, 82, 78],
+                                backgroundColor: [palette.primary, palette.primary, palette.primary, palette.secondary, palette.secondary],
+                            }]
+                        },
+                        options: {
+                            ...defaultChartOptions,
+                            indexAxis: 'y',
+                            plugins: { ...defaultChartOptions.plugins, legend: { display: false } }
+                        }
+                    });
+                } else if (chartInstances.skillsChart) {
+                    chartInstances.skillsChart.update();
+                }
+            };
+
+
+            const showSlide = (index) => {
+                slides.forEach((slide, i) => {
+                    slide.classList.remove('active');
+                    slide.style.display = 'none'; // Ensure it's truly hidden
+                });
+
+                slides[index].style.display = 'flex'; // Display the target slide
+                slides[index].classList.add('active'); // Add active class for transition
+
+                // Reset animation properties for elements in the current slide
+                const elementsToAnimate = slides[index].querySelectorAll('.animate-on-show');
+                elementsToAnimate.forEach(el => {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(20px)';
+                    el.style.transition = 'none'; // Temporarily disable transition for reset
+                });
+
+                // Trigger reflow to apply 'none' transition before setting new values
+                slides[index].offsetWidth;
+
+                // Animate elements sequentially
+                elementsToAnimate.forEach((el, elIndex) => {
+                    setTimeout(() => {
+                        el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    }, elIndex * 200); // Staggered delay for appearance
+                });
+
+                // Create or update charts only when the relevant slide is displayed
+                if ([2, 3, 4, 6, 7, 8].includes(index)) { // Updated indices to include new content on slides 2, 3, 4, 6, 7, 8
+                    createCharts();
+                }
+
+                currentSlideIndex = index;
+                updateSlideCounter();
+            };
+
+            const nextSlide = () => {
+                if (currentSlideIndex < totalSlides - 1) { // Use totalSlides
+                    showSlide(currentSlideIndex + 1);
+                }
+            };
+
+            const prevSlide = () => {
+                if (currentSlideIndex > 0) {
+                    showSlide(currentSlideIndex - 1);
+                }
+            };
+
+            document.getElementById('nextSlide').addEventListener('click', nextSlide);
+            document.getElementById('prevSlide').addEventListener('click', prevSlide);
+
+            showSlide(currentSlideIndex); // Show the first slide on load
+        });
+    </script>
+</body>
+</html>
